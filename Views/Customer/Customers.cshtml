@@ -1,0 +1,66 @@
+﻿@using CustomerInvoiceManagementSystem.Models
+@model CustomerListViewModel
+
+@{
+    ViewBag.Title = "Customers";
+    var selectedGroup = Model.SelectedGroup ?? "A-E";
+}
+
+<h2>Customers</h2>
+
+@if (TempData["UndoDelete"] != null)
+{
+    var deletedCustomerId = (int)TempData["UndoDelete"];
+    var deletedCustomer = TempData["NameOfDeletedCustomer"].ToString();
+
+    if (deletedCustomer != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>The customer "@deletedCustomer" was deleted!</strong><a asp-controller="Customer" asp-action="UndoDelete" asp-route-id="@deletedCustomerId" asp-route-group="@selectedGroup" class="btn btn-link">Undo</a>this delete.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+}
+<a asp-controller="Customer" asp-action="GetAddNewCustomerRequest" asp-route-group="@selectedGroup" class="btn btn-primary">Add new customer</a>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th style="width: 30%;">Name</th>
+            <th style="width: 30%;">Address</th>
+            <th style="width: 30%;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model.Customers)
+        {
+            <tr>
+                <td>@customer.Name</td>
+                <td>@customer.Address1</td>
+                <td>
+                    <a asp-controller="Invoice" asp-action="GetAllInvoicesRequestByCustomerId" asp-route-customerId="@customer.CustomerId" asp-route-group="@Model.SelectedGroup">Invoices</a>
+                    <span class="mx-1">|</span>
+                    <a asp-controller="Customer" asp-action="GetEditCustomerRequestById" asp-route-id="@customer.CustomerId" asp-route-group="@selectedGroup">Edit</a>
+                    <span class="mx-1">|</span>
+                    <a asp-controller="Customer" asp-action="SoftDeleteCustomer" asp-route-id="@customer.CustomerId" asp-route-group="@selectedGroup">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="btn-group mb-3" role="group" aria-label="Group selection">
+    @foreach (var group in Model.Groups)
+    {
+        <a class="btn btn-outline-secondary @((selectedGroup == group) ? "active" : "")" asp-controller="Customer" asp-action="GetAllCustomers" asp-route-group="@group">
+            @group
+        </a>
+    }
+</div>
+
+<script>
+    // Fade out the undo link after 6 seconds
+    setTimeout(function () {
+        $(".alert").fadeOut();
+    }, 6000);
+</script>
+

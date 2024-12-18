@@ -1,0 +1,91 @@
+﻿@model Invoicing.Entities.Customer
+
+@{
+    var isEditMode = Model.CustomerId != 0;
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        There are errors in the form. Please fix them before submitting.
+    </div>
+}
+
+<form asp-controller="Customer" asp-action="@((isEditMode ? "SaveCustomer" : "AddCustomer"))" method="post" enctype="application/x-www-form-urlencoded">
+    <input type="hidden" asp-for="CustomerId" />
+    <input type="hidden" name="Group" value="@ViewData["CurrentGroup"]" />
+
+    <div class="form-group">
+        <label asp-for="Name" class="mb-1">Name:</label>
+        <div class="d-flex align-items-center">
+            <input type="text" asp-for="Name" class="form-control @(ViewData.ModelState["Name"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+            <span class="text-danger" asp-validation-for="Name"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Address1" class="mb-1">Address 1:</label>
+        <div class="d-flex align-items-center">
+            <input type="text" asp-for="Address1" class="form-control @(ViewData.ModelState["Address1"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+            <span class="text-danger ml-2" asp-validation-for="Address1"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Address2">Address 2:</label>
+        <input type="text" asp-for="Address2" class="form-control @(ViewData.ModelState["Address2"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="City">City:</label>
+        <div class="d-flex align-items-center">
+            <input type="text" asp-for="City" class="form-control @(ViewData.ModelState["City"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+            <span class="text-danger" asp-validation-for="City"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProvinceOrState">Province/State:</label>
+        <div class="d-flex align-items-center">
+            <input type="text" asp-for="ProvinceOrState" class="form-control @(ViewData.ModelState["ProvinceOrState"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+            <span class="text-danger" asp-validation-for="ProvinceOrState"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ZipOrPostalCode">Zip/postal code:</label>
+        <div class="d-flex align-items-center">
+            <input type="text" asp-for="ZipOrPostalCode" class="form-control @(ViewData.ModelState["ZipOrPostalCode"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+            <span class="text-danger" asp-validation-for="ZipOrPostalCode"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Phone">Phone:</label>
+        <div class="d-flex align-items-center">
+            <input type="text" asp-for="Phone" class="form-control @(ViewData.ModelState["Phone"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+            <span class="text-danger" asp-validation-for="Phone"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ContactFirstName">Contact first name:</label>
+        <input type="text" asp-for="ContactFirstName" class="form-control @(ViewData.ModelState["ContactFirstName"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ContactLastName">Contact last name:</label>
+        <input type="text" asp-for="Name" class="form-control @(ViewData.ModelState["ContactLastName"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ContactEmail">Contact email:</label>
+        <div class="d-flex align-items-center">
+            <input type="text" asp-for="ContactEmail" class="form-control @(ViewData.ModelState["ContactEmail"]?.Errors.Any() == true ? "is-invalid" : "")" style="width: 80%" />
+            <span class="text-danger" asp-validation-for="ContactEmail"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">@((isEditMode ? "Save changes" : "Add customer"))</button>
+    <a asp-controller="Customer" asp-action="GetAllCustomers" asp-route-group="@ViewData["CurrentGroup"]" class="btn btn-primary">Cancel</a>
+</form>

@@ -1,0 +1,133 @@
+﻿@model CustomerInvoiceManagementSystem.Models.InvoiceViewModel
+
+<div class="container">
+    <!-- Heading Section -->
+
+    <div class="d-flex justify-content-between mb-4">
+        <span><h1>Invoices for @Model.CustomerName</h1></span>
+        <span class="d-flex align-items-center">
+            <a asp-controller="Customer"
+               asp-action="GetAllCustomers"
+               asp-route-group="@Model.Group">
+                Return to group @Model.Group of customers
+            </a>
+        </span>
+    </div>
+
+    <div class="d-flex justify-content-between mb-5">
+        <span>
+            <strong>Address:</strong> @Model.Address1,@if (!string.IsNullOrWhiteSpace(Model.Address2))
+            {
+                <span>@Model.Address2,</span>
+            } @Model.City, @Model.ProvinceOrState, @Model.ZipOrPostalCode<br />
+        </span>
+        <span><strong>Payment Terms:</strong> @Model.DueDays days</span>
+    </div>
+
+
+
+    <div class="row mt-4">
+        <!-- Left Section: Invoices Table -->
+        <div class="col-md-6">
+            <h3>Invoices</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Invoice Number</th>
+                        <th>Due Date</th>
+                        <th>Amount Paid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var invoice in Model.Invoices)
+                    {
+                        // Check if the current invoice is the selected invoice
+                        var isSelected = invoice.InvoiceId == Model.SelectedInvoiceId;
+                        var rowClass = isSelected ? "highlight" : "";
+                        <tr class="@rowClass">
+                            <td>
+                                <a asp-controller="Invoice"
+                                   asp-action="GetAllInvoicesRequestByCustomerId"
+                                   asp-route-customerId="@Model.CustomerId"
+                                   asp-route-selectedInvoiceId="@invoice.InvoiceId"
+                                   asp-route-group="@Model.SelectedGroup">
+                                    @invoice.InvoiceId
+                                </a>
+                            </td>
+                            <td>@invoice.InvoiceDueDate?.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                @invoice.AmountPaid
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Add New Invoice Form -->
+            <h4>Add New Invoice</h4>
+            <form asp-action="AddInvoice" asp-controller="Invoice" method="post">
+                <input type="hidden" name="CustomerId" value="@Model.CustomerId" />
+                <input type="hidden" name="Group" value="@Model.Group" />
+                <input type="hidden" name="SelectedGroup" value="@Model.SelectedGroup" />
+                <div class="form-group">
+                    <label asp-for="InvoiceDate">Invoice Date</label>
+                    <input type="date" id="InvoiceDate" name="InvoiceDate" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label for="PaymentTerms">Terms</label>
+                    <select name="SelectedPaymentTermId" class="form-control" required>
+                        <option value="">-- Select Payment Terms --</option>
+                        @foreach (var paymentTerm in Model.PaymentTermsList)
+                        {
+                            <option value="@paymentTerm.PaymentTermsId"
+                                    selected="@(paymentTerm.PaymentTermsId == Model.SelectedPaymentTermId ? "selected" : null)">
+                                @paymentTerm.Description
+                            </option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Invoice</button>
+            </form>
+        </div>
+
+        <!-- Right Section: Invoice Line Items -->
+        <div class="col-md-6">
+            <h3>Invoice Details</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var lineItem in Model.SelectedInvoiceLineItems)
+                    {
+                        <tr>
+                            <td>@lineItem.Description</td>
+                            <td>@lineItem.Amount?.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p><strong>Total:</strong> @Model.SelectedInvoiceTotal.ToString("C")</p>
+
+            <!-- Add New Line Item Form -->
+            <h4>Add New Line Item</h4>
+            <form asp-action="AddInvoiceLineItem" asp-controller="Invoice" method="post">
+                <input type="hidden" name="InvoiceId" value="@Model.SelectedInvoiceId" />
+                <input type="hidden" name="CustomerId" value="@Model.CustomerId" />
+                <input type="hidden" name="Group" value="@Model.Group" />
+                <div class="form-group">
+                    <label for="Description">Description</label>
+                    <input type="text" id="Description" name="Description" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label for="Amount">Amount</label>
+                    <input type="number" id="Amount" name="Amount" class="form-control" step="0.01" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Add Line Item</button>
+            </form>
+        </div>
+    </div>
+</div>
